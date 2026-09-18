@@ -1,0 +1,10 @@
+Coloque aqui as imagens dos prêmios (PNG ou JPG).
+
+Depois referencie no config.js, no prêmio correspondente:
+
+    { name: "Air Fryer", weight: 4, image: "assets/premios/airfryer.png", ... }
+
+A imagem aparece na tela de resultado. Se o arquivo não existir,
+a roleta continua funcionando normalmente (mostra só o nome do prêmio).
+
+Sugestão: imagens quadradas, fundo transparente, cerca de 400x400 px.

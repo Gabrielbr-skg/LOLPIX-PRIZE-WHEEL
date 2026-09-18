@@ -1,0 +1,15 @@
+Os três efeitos sonoros já estão prontos nesta pasta:
+
+    tick.mp3  -> clique a cada segmento que passa pelo ponteiro
+    win.mp3   -> arpejo de sinos quando o prêmio aparece
+
+Para trocar por outros sons, substitua os arquivos mantendo os mesmos nomes
+(ou aponte outros caminhos no bloco sounds.files do config.js).
+
+O som do giro é .wav de propósito: o MP3 insere um pequeno silêncio nas
+pontas do arquivo, o que criaria uma "batidinha" a cada repetição do loop.
+
+Se algum arquivo for apagado, a roleta continua funcionando normalmente,
+apenas sem aquele som.
+
+Para desligar todos os sons, em config.js:  sounds: { enabled: false }

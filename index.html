@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Roleta de Brindes</title>
+  <meta name="description" content="Roleta de brindes para eventos corporativos.">
+
+  <link rel="icon" href="assets/logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       PLANO DE FUNDO DECORATIVO (puramente visual, sem impacto em performance)
+       ============================================================ -->
+  <div class="bg-glow bg-glow--amber" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--ember" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="app-header" id="appHeader">
+    <div class="app-header__brand">
+      <img id="companyLogo" class="app-header__logo" src="" alt="" hidden>
+      <span id="eventName" class="app-header__event"></span>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       ÁREA PRINCIPAL — ROLETA
+       ============================================================ -->
+  <main class="stage">
+
+    <div class="wheel-area">
+      <div class="wheel-pointer" aria-hidden="true">
+        <svg viewBox="0 0 40 46" width="40" height="46">
+          <path d="M20 46 L2 14 A20 20 0 0 1 38 14 Z" fill="#ffffff" stroke="#16151a" stroke-width="2.5"/>
+        </svg>
+      </div>
+
+      <div class="wheel-frame" id="wheelFrame" role="button" tabindex="0"
+           aria-label="Roleta de prêmios. Arraste para girar, ou pressione Enter.">
+        <div class="wheel-ring" aria-hidden="true"></div>
+        <canvas id="wheelCanvas" class="wheel-canvas" role="img" aria-label="Roleta de prêmios"></canvas>
+        <div class="wheel-hub" aria-hidden="true">
+          <img id="wheelHubLogo" class="wheel-hub__logo" src="" alt="" hidden>
+        </div>
+      </div>
+
+      <!-- Mensagem exibida somente se não houver prêmios elegíveis -->
+      <div id="emptyState" class="empty-state" hidden>
+        <p class="empty-state__title" id="emptyStateTitle"></p>
+        <p class="empty-state__message" id="emptyStateMessage"></p>
+      </div>
+    </div>
+
+    <!-- Dica de gesto (modo "drag") -->
+    <p class="drag-hint" id="dragHint" aria-live="polite">
+      <svg class="drag-hint__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4.5 13a7.5 7.5 0 1 1 3 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M3 17.5 4.5 12l5.5 1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span id="dragHintText"></span>
+    </p>
+
+    <!-- Botão clássico (exibido apenas se interaction.mode for "button" ou "both") -->
+    <button id="spinButton" class="spin-button" type="button" hidden>
+      <span id="spinButtonLabel">GIRAR</span>
+    </button>
+
+  </main>
+
+  <footer class="app-footer">
+    <span id="footerNote"></span>
+  </footer>
+
+  <!-- ============================================================
+       BOTÕES FLUTUANTES (discretos)
+       ============================================================ -->
+  <button id="fullscreenButton" class="icon-button icon-button--fullscreen" type="button" aria-label="Alternar tela cheia">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <button id="adminToggle" class="icon-button icon-button--admin" type="button" aria-label="Abrir painel administrativo">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2.06 2.06 0 1 1-2.92 2.92l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.55V20a2.06 2.06 0 1 1-4.12 0v-.1a1.7 1.7 0 0 0-1.11-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2.06 2.06 0 1 1-2.92-2.92l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1.03H4a2.06 2.06 0 1 1 0-4.12h.1a1.7 1.7 0 0 0 1.55-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2.06 2.06 0 1 1 2.92-2.92l.06.06a1.7 1.7 0 0 0 1.87.34H10a1.7 1.7 0 0 0 1.03-1.55V4a2.06 2.06 0 1 1 4.12 0v.1a1.7 1.7 0 0 0 1.03 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2.06 2.06 0 1 1 2.92 2.92l-.06.06a1.7 1.7 0 0 0-.34 1.87V10a1.7 1.7 0 0 0 1.55 1.03H20a2.06 2.06 0 1 1 0 4.12h-.1a1.7 1.7 0 0 0-1.5 1.03Z" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+  </button>
+
+  <!-- ============================================================
+       MODAL DE RESULTADO
+       ============================================================ -->
+  <div id="resultOverlay" class="overlay" hidden>
+    <div class="result-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <div class="result-card__confetti" id="confettiLayer" aria-hidden="true"></div>
+      <h2 class="result-card__title" id="resultTitle">PARABÉNS!</h2>
+      <p class="result-card__eyebrow" id="resultSubtitle">Você ganhou:</p>
+      <div class="result-card__prize">
+        <img id="resultPrizeImage" class="result-card__image" src="" alt="" hidden>
+        <p id="resultPrizeName" class="result-card__name"></p>
+      </div>
+      <button id="closeResultButton" class="btn-secondary" type="button">Fechar</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PAINEL ADMINISTRATIVO (oculto do público)
+       ============================================================ -->
+  <div id="adminPanel" class="admin-panel" hidden>
+    <div class="admin-panel__backdrop" id="adminBackdrop"></div>
+    <aside class="admin-panel__drawer" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+      <header class="admin-panel__header">
+        <h2 id="adminTitle">Painel administrativo</h2>
+        <button id="adminClose" class="icon-button icon-button--close" type="button" aria-label="Fechar painel">✕</button>
+      </header>
+
+      <!-- Portão de PIN, exibido apenas se CONFIG.admin.pin estiver definido -->
+      <div id="adminPinGate" class="admin-panel__section" hidden>
+        <label for="adminPinInput">PIN de acesso</label>
+        <div class="admin-pin-row">
+          <input id="adminPinInput" type="password" inputmode="numeric" autocomplete="off" aria-describedby="adminPinError">
+          <button id="adminPinSubmit" class="btn-primary" type="button">Entrar</button>
+        </div>
+        <p id="adminPinError" class="admin-panel__error" role="alert" hidden>PIN incorreto.</p>
+      </div>
+
+      <div id="adminContent" class="admin-panel__content">
+
+        <section class="admin-panel__section">
+          <h3>Prêmios &amp; probabilidades</h3>
+          <p class="admin-panel__hint">Alterações aqui valem apenas para esta sessão. Para alterar de forma permanente, edite <code>config.js</code>.</p>
+          <div class="admin-table-wrap">
+            <table class="admin-table" id="prizeTable">
+              <thead>
+                <tr>
+                  <th scope="col">Prêmio</th>
+                  <th scope="col">Peso</th>
+                  <th scope="col">Prob.</th>
+                  <th scope="col">Estoque</th>
+                  <th scope="col">Ativo</th>
+                </tr>
+              </thead>
+              <tbody id="prizeTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-panel__section">
+          <div class="admin-stats" id="adminStats"></div>
+        </section>
+
+        <section class="admin-panel__section">
+          <div class="admin-panel__row">
+            <h3>Histórico de sorteios</h3>
+            <button id="clearHistoryButton" class="btn-link" type="button">Limpar histórico</button>
+          </div>
+          <ul class="admin-history" id="adminHistory"></ul>
+        </section>
+
+      </div>
+    </aside>
+  </div>
+
+  <!-- ============================================================
+       ÁUDIO (carregado sob demanda pelo AudioManager)
+       ============================================================ -->
+  <audio id="audioSpin" preload="none" loop></audio>
+  <audio id="audioTick" preload="none"></audio>
+  <audio id="audioWin" preload="none"></audio>
+
+  <!-- Ordem importa: config primeiro, depois a lógica da aplicação -->
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
