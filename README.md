@@ -1,4 +1,4 @@
-# Roleta de Brindes — Eventos Corporativos
+# Roleta de Brindes — Eventos
 
 Roleta de sorteio de brindes com **sistema de probabilidades por peso**, feita em
 HTML, CSS e JavaScript puro, com a identidade visual da LolPix (laranja
